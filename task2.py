@@ -1,47 +1,25 @@
-import turtle
+import heapq
 
-def draw_koch_segment(t, length, level):
-    if level == 0:
-        t.forward(length)
-    else:
-        length /= 3.0
-        draw_koch_segment(t, length, level - 1)
-        t.left(60)
-        draw_koch_segment(t, length, level - 1)
-        t.right(120)
-        draw_koch_segment(t, length, level - 1)
-        t.left(60)
-        draw_koch_segment(t, length, level - 1)
+def merge_k_lists(arr):
 
-def draw_snowflake(t, length, level):
-    for _ in range(3):
-        draw_koch_segment(t, length, level)
-        t.right(120)
+    min_heap = []
 
-def main():
-    screen = turtle.Screen()
-    screen.setup(width=800, height=800)
+    for i, lst in enumerate(arr):
+        if lst:
+            heapq.heappush(min_heap, (lst[0], i, 0))
 
-    # Prompt user for recursion level
-    try:
-        level = int(input("Enter recursion level (e.g., 3): "))
-        if level < 0:
-            print("Recursion level must be a non-negative integer.")
-            return
-    except ValueError:
-        print("Please enter an integer.")
-        return
+    result = []
 
-    t = turtle.Turtle()
-    t.speed(0)
-    t.penup()
-    t.goto(-200, 100)
-    t.pendown()
+    while min_heap:
+        val, list_idx, elem_idx = heapq.heappop(min_heap)
+        result.append(val)
 
-    draw_snowflake(t, 400, level)
+        if elem_idx + 1 < len(arr[list_idx]):
+            next_val = arr[list_idx][elem_idx + 1]
+            heapq.heappush(min_heap, (next_val, list_idx, elem_idx + 1))
 
-    t.hideturtle()
-    screen.mainloop()
+    return result
 
-if __name__ == "__main__":
-    main()
+test_list = [[1, 4, 5], [1, 3, 4], [2, 6]]
+merged_list = merge_k_lists(test_list)
+print("Sorted list", merged_list)

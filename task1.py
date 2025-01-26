@@ -1,59 +1,64 @@
-import os
-import shutil
-import argparse
-from pathlib import Path
+import random
+import timeit
 
-def get_unique_filename(dest_dir, filename):
-    base_name, ext = os.path.splitext(filename)
-    counter = 1
-    unique_name = filename
+def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and key < arr[j]:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
 
-    while os.path.exists(os.path.join(dest_dir, unique_name)):
-        unique_name = f"{base_name}({counter}){ext}"
-        counter += 1
+def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        left_half = arr[:mid]
+        right_half = arr[mid:]
 
-    return unique_name
+        merge_sort(left_half)
+        merge_sort(right_half)
 
-def copy_and_sort_files(src_dir, dest_dir):
-    try:
-        for item in os.listdir(src_dir):
-            src_item_path = os.path.join(src_dir, item)
+        i = j = k = 0
 
-            if os.path.isdir(src_item_path):
-                copy_and_sort_files(src_item_path, dest_dir)
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i] < right_half[j]:
+                arr[k] = left_half[i]
+                i += 1
+            else:
+                arr[k] = right_half[j]
+                j += 1
+            k += 1
 
-            elif os.path.isfile(src_item_path):
-                file_extension = Path(item).suffix.lower() or "unknown"
-                dest_subdir = os.path.join(dest_dir, file_extension[1:] if file_extension.startswith('.') else file_extension)
-                os.makedirs(dest_subdir, exist_ok=True)
+        while i < len(left_half):
+            arr[k] = left_half[i]
+            i += 1
+            k += 1
 
-                unique_filename = get_unique_filename(dest_subdir, item)
-                dest_file_path = os.path.join(dest_subdir, unique_filename)
+        while j < len(right_half):
+            arr[k] = right_half[j]
+            j += 1
+            k += 1
+    return arr
 
-                shutil.copy2(src_item_path, dest_file_path)
-    except Exception as e:
-        print(f"Error processing {src_dir}: {e}")
 
+def benchmark_sorting_algorithms():
+    sizes = [100, 1000, 10000]
+    results = []
 
-def main():
-    parser = argparse.ArgumentParser(description="Recursive file sorter.")
-    parser.add_argument("source", type=str, help="Path to the source directory.")
-    parser.add_argument("destination", type=str, nargs="?", default="dist", help="Path to the destination directory.")
+    for size in sizes:
+        data = [random.randint(0, size) for _ in range(size)]
 
-    args = parser.parse_args()
-    src_dir = args.source
-    dest_dir = args.destination
+        insertion_time = timeit.timeit(lambda: insertion_sort(data.copy()), number=1)
+        merge_time = timeit.timeit(lambda: merge_sort(data.copy()), number=1)
+        timsort_time = timeit.timeit(lambda: sorted(data.copy()), number=1)
 
-    if not os.path.exists(src_dir):
-        print(f"Error: Source directory '{src_dir}' does not exist.")
-        return
+        results.append((size, insertion_time, merge_time, timsort_time))
 
-    os.makedirs(dest_dir, exist_ok=True)
-
-    copy_and_sort_files(src_dir, dest_dir)
-
-    print(f"Files from '{src_dir}' have been successfully copied and sorted into '{dest_dir}'.")
-
+    print("Size\tInsertion Sort\tMerge Sort\tTimsort")
+    for size, insertion_time, merge_time, timsort_time in results:
+        print(f"{size}\t{insertion_time:.6f}\t{merge_time:.6f}\t{timsort_time:.6f}")
 
 if __name__ == "__main__":
-    main()
+    benchmark_sorting_algorithms()
