@@ -1,29 +1,26 @@
-def check_brackets(expression):
-    stack = []
-    bracket_map = {')': '(', ']': '[', '}': '{'}
-    opening_brackets = bracket_map.values()
+def hanoi(n, source, target, auxiliary, state):
 
-    for char in expression:
-        if char in opening_brackets:
-            stack.append(char)
-        elif char in bracket_map:
-            if stack and stack[-1] == bracket_map[char]:
-                stack.pop()
-            else:
-                return "Not Symmetrical"
+    if n == 1:
+        disk = state[source].pop()
+        state[target].append(disk)
+        print(f"Move disk from {source} to {target}: {disk}")
+        print(f"Intermediate state: {state}")
+    else:
+        hanoi(n - 1, source, auxiliary, target, state)
+        hanoi(1, source, target, auxiliary, state)
+        hanoi(n - 1, auxiliary, target, source, state)
 
-    return "Symmetrical" if not stack else "Not Symmetrical"
+def solve_hanoi(n):
 
+    state = {
+        'A': list(range(n, 0, -1)),
+        'B': [],
+        'C': []
+    }
+    print(f"Initial state: {state}")
+    hanoi(n, 'A', 'C', 'B', state)
+    print(f"Final state: {state}")
 
 if __name__ == "__main__":
-    test_expressions = [
-        "( ){[ 1 ]( 1 + 3 )( ){ }}",
-        "( 23 ( 2 - 3);",
-        "( 11 }",
-        "(([]{}))",
-        "([)]",
-    ]
-
-    for expr in test_expressions:
-        result = check_brackets(expr)
-        print(f"'{expr}': {result}")
+    n = int(input("Enter the number of disks: "))
+    solve_hanoi(n)
