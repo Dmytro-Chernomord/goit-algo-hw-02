@@ -1,25 +1,27 @@
-import heapq
+from typing import List, Tuple, Optional
 
-def merge_k_lists(arr):
 
-    min_heap = []
+def binary_search(arr: List[float], target: float) -> Tuple[int, Optional[float]]:
+    left, right = 0, len(arr) - 1
+    iterations = 0
+    upper_bound = None
 
-    for i, lst in enumerate(arr):
-        if lst:
-            heapq.heappush(min_heap, (lst[0], i, 0))
+    while left <= right:
+        iterations += 1
+        mid = (left + right) // 2
 
-    result = []
+        if arr[mid] == target:
+            return iterations, arr[mid]
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            upper_bound = arr[mid]
+            right = mid - 1
 
-    while min_heap:
-        val, list_idx, elem_idx = heapq.heappop(min_heap)
-        result.append(val)
+    return iterations, upper_bound
 
-        if elem_idx + 1 < len(arr[list_idx]):
-            next_val = arr[list_idx][elem_idx + 1]
-            heapq.heappush(min_heap, (next_val, list_idx, elem_idx + 1))
 
-    return result
-
-test_list = [[1, 4, 5], [1, 3, 4], [2, 6]]
-merged_list = merge_k_lists(test_list)
-print("Sorted list", merged_list)
+sorted_array = [1.1, 2.2, 3.3, 4.4, 5.5]
+target_value = 3.6
+result = binary_search(sorted_array, target_value)
+print(result) 
