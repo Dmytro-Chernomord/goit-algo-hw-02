@@ -1,27 +1,61 @@
-from typing import List, Tuple, Optional
+from collections import deque
 
 
-def binary_search(arr: List[float], target: float) -> Tuple[int, Optional[float]]:
-    left, right = 0, len(arr) - 1
-    iterations = 0
-    upper_bound = None
+def dfs(graph, start, goal, path=None, visited=None):
+    if path is None:
+        path = []
+    if visited is None:
+        visited = set()
 
-    while left <= right:
-        iterations += 1
-        mid = (left + right) // 2
+    path.append(start)
+    visited.add(start)
 
-        if arr[mid] == target:
-            return iterations, arr[mid]
-        elif arr[mid] < target:
-            left = mid + 1
-        else:
-            upper_bound = arr[mid]
-            right = mid - 1
+    if start == goal:
+        return path
 
-    return iterations, upper_bound
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            new_path = dfs(graph, neighbor, goal, path.copy(), visited.copy())
+            if new_path:
+                return new_path
+
+    return None
 
 
-sorted_array = [1.1, 2.2, 3.3, 4.4, 5.5]
-target_value = 3.6
-result = binary_search(sorted_array, target_value)
-print(result) 
+def bfs(graph, start, goal):
+    queue = deque([(start, [start])])
+    visited = set()
+
+    while queue:
+        current, path = queue.popleft()
+        visited.add(current)
+
+        if current == goal:
+            return path
+
+        for neighbor in graph[current]:
+            if neighbor not in visited:
+                queue.append((neighbor, path + [neighbor]))
+                visited.add(neighbor)
+
+    return None
+
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+
+start_node = 'A'
+goal_node = 'C'
+
+dfs_path = dfs(graph, start_node, goal_node)
+bfs_path = bfs(graph, start_node, goal_node)
+
+print(f"DFS Path: {dfs_path}")
+print(f"BFS Path: {bfs_path}")
+
