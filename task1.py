@@ -1,28 +1,19 @@
-import networkx as nx
-import matplotlib.pyplot as plt
+import heapq
 
-G = nx.Graph()
 
-stations = ["A", "B", "C", "D", "E", "F", "G", "H"]
-G.add_nodes_from(stations)
+def min_cost_to_connect_cables(cables):
+    heapq.heapify(cables)
+    total_cost = 0
 
-edges = [("A", "B"), ("B", "C"), ("C", "D"), ("D", "E"),
-         ("E", "F"), ("F", "G"), ("G", "H"), ("B", "E"), ("C", "F")]
-G.add_edges_from(edges)
+    while len(cables) > 1:
+        first = heapq.heappop(cables)
+        second = heapq.heappop(cables)
+        cost = first + second
+        total_cost += cost
+        heapq.heappush(cables, cost)
 
-plt.figure(figsize=(8,6))
-nx.draw(G, with_labels=True, node_color='lightblue', edge_color='gray', node_size=2000, font_size=12)
-plt.title("City Transport Network")
-plt.show()
+    return total_cost
 
-num_nodes = G.number_of_nodes()
-num_edges = G.number_of_edges()
-degrees = dict(G.degree())
-avg_degree = sum(degrees.values()) / num_nodes
 
-print(f"Number of nodes: {num_nodes}")
-print(f"Number of edges: {num_edges}")
-print("Node degrees:")
-for node, degree in degrees.items():
-    print(f"{node}: {degree}")
-print(f"Average node degree: {avg_degree:.2f}")
+test = [4, 3, 2, 6, 1]
+print(min_cost_to_connect_cables(test))
