@@ -1,59 +1,39 @@
-class Node:
-    def __init__(self, key):
-        self.key = key
-        self.left = None
-        self.right = None
+def find_coins_greedy(amount):
+    coins = [50, 25, 10, 5, 2, 1]
+    result = {}
+
+    for coin in coins:
+        if amount >= coin:
+            count = amount // coin
+            result[coin] = count
+            amount -= count * coin
+
+    return result
+
+def find_min_coins(amount):
+    coins = [50, 25, 10, 5, 2, 1]
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0
+    coin_used = [-1] * (amount + 1)
+
+    for coin in coins:
+        for i in range(coin, amount + 1):
+            if dp[i - coin] + 1 < dp[i]:
+                dp[i] = dp[i - coin] + 1
+                coin_used[i] = coin
+
+    result = {}
+    while amount > 0:
+        coin = coin_used[amount]
+        if coin == -1:
+            return {}
+        result[coin] = result.get(coin, 0) + 1
+        amount -= coin
+
+    return result
 
 
-class BinarySearchTree:
-    def __init__(self):
-        self.root = None
-
-    def insert(self, key):
-        self.root = self._insert_recursive(self.root, key)
-
-    def _insert_recursive(self, node, key):
-        if node is None:
-            return Node(key)
-        if key < node.key:
-            node.left = self._insert_recursive(node.left, key)
-        else:
-            node.right = self._insert_recursive(node.right, key)
-        return node
-
-    def find_max(self):
-        if self.root is None:
-            return None
-        current = self.root
-        while current.right:
-            current = current.right
-        return current.key
-
-    def find_min(self):
-        if self.root is None:
-            return None
-        current = self.root
-        while current.left:
-            current = current.left
-        return current.key
-
-    def sum_values(self):
-        return self._sum_recursive(self.root)
-
-    def _sum_recursive(self, node):
-        if node is None:
-            return 0
-        return node.key + self._sum_recursive(node.left) + self._sum_recursive(node.right)
-
-
-# Example usage
-binary_search_tree = BinarySearchTree()
-binary_search_tree.insert(20)
-binary_search_tree.insert(10)
-binary_search_tree.insert(300)
-binary_search_tree.insert(25)
-binary_search_tree.insert(40)
-
-print("Maximum value in the tree:", binary_search_tree.find_max())
-print("Minimum value in the tree:", binary_search_tree.find_min())
-print("Sum of all values in the tree:", binary_search_tree.sum_values())
+# Testing
+amount = 167
+print("Greedy Algorithm:", find_coins_greedy(amount))
+print("Dynamic Programming Algorithm:", find_min_coins(amount))
